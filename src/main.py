@@ -1,10 +1,14 @@
 import pygame
 import sys
+import os
 
 from const import *
 from game import Game
 from square import Square
 from move import Move
+
+# Move up one directory to project root
+os.chdir(os.path.dirname(os.path.dirname(__file__)))
 
 class Main:
     def __init__(self):

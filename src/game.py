@@ -4,6 +4,7 @@ from board import Board
 from dragger import Dragger
 from config import Config
 from square import Square
+from ai import ChessAI
 
 class Game:
     
@@ -13,6 +14,7 @@ class Game:
         self.next_player = 'white'
         self.hovered_sqr = None
         self.config = Config()
+        self.ai = ChessAI(k=5)
     
     # Show methods
     
@@ -108,6 +110,22 @@ class Game:
 
     def next_turn(self):
         self.next_player = 'white' if self.next_player == 'black' else 'black'
+        
+        if self.next_player == 'black':
+            self.make_ai_move()
+        
+    def make_ai_move(self):
+        ai_move = self.ai.get_best_move(self.board)
+        
+        if ai_move:
+            piece = self.board.squares[ai_move.initial.row][ai_move.initial.col].piece
+            
+            captured = self.board.squares[ai_move.final.row][ai_move.final.col].has_piece()
+            self.board.move(piece, ai_move)
+            
+            self.play_sound(captured)
+            
+            self.next_turn()
         
     def set_hover(self, row, col):
         try:
