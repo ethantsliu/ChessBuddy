@@ -65,7 +65,7 @@ class Board:
         temp_board = copy.deepcopy(self)
         temp_board.move(temp_piece, move)
         
-        # Is the king currently in check? 
+        # # Is the king currently in check? 
         # in_check = False
         # for row in range(ROWS):
         #     for col in range(COLS):
