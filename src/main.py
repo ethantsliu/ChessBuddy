@@ -46,9 +46,11 @@ class Main:
                     try:
                         if board.squares[clicked_row][clicked_col].has_piece():
                             piece = board.squares[clicked_row][clicked_col].piece
+                            print(f"Selected {piece.name} at {clicked_row},{clicked_col}")
                             # valid piece color? 
                             if piece.color == game.next_player:                           
-                                board.calc_moves(piece, clicked_row, clicked_col, bool = True)
+                                board.calc_moves(piece, clicked_row, clicked_col, bool=True)
+                                print(f"Calculated moves: {len(piece.moves)}")
                                 dragger.save_initial(event.pos)
                                 dragger.drag_piece(piece)
                                 # show methods

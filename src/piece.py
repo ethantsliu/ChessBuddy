@@ -28,36 +28,40 @@ class Pawn(Piece):
     
     def __init__(self, color):
         #With color, we know which direction pawn can move
-        
-        self.dir = -1 if color == 'white' else 1
-        #Pygame module has increasing y-axis toward bottom
-        
         super().__init__('pawn', color, value = 1.0)
+        self.protected = False # if the piece is protected by another piece, for all except king
+        self.dir = -1 if color == 'white' else 1 #Pygame module has increasing y-axis toward bottom
 
 class Knight(Piece):
-    
     def __init__(self, color):
         super().__init__('knight', color, value = 3.0)
+        self.protected = False # if the piece is protected by another piece, for all except king
         
 class Bishop(Piece):
     
     def __init__(self, color):
         super().__init__('bishop', color, value = 3.0)
+        self.protected = False # if the piece is protected by another piece, for all except king
 
 class Rook(Piece):
     
     def __init__(self, color):
         super().__init__('rook', color, value = 5.0)
+        self.protected = False # if the piece is protected by another piece, for all except king
         
 class Queen(Piece):
     
     def __init__(self, color):
         super().__init__('queen', color, value = 9.0)
+        self.protected = False # if the piece is protected by another piece, for all except king
         
 class King(Piece):
-    def __init__(self, color):
+    def __init__(self, color, xPos, yPos):
         self.left_rook = None
         self.right_rook = None
+        self.x = xPos
+        self.y = yPos
+        self.in_check = False # only for king
         super().__init__('king', color, value = 1000000.0)
 
         

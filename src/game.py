@@ -71,6 +71,7 @@ class Game:
         theme = self.config.theme
         if self.dragger.dragging:
             piece = self.dragger.piece
+            print(f"Showing moves for {piece.name}: {len(piece.moves)} moves")
             
             # loop all valid or possible moves
             for move in piece.moves:
