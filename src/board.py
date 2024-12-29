@@ -89,8 +89,6 @@ class Board:
             1) THe king is already in check
             2) The piece is pinned, and moving it puts the king in check
         '''
-        if piece.name == 'king':
-            return self.is_king_in_check(piece) or self.pinned(piece, move)  # is_king_in_check will return a non-empty list if True
         return self.pinned(piece, move)
             
     
@@ -127,6 +125,10 @@ class Board:
                     for move in piece.moves:
                         if type(move.final.piece) == King:
                             attacking.append([row, col])
+        if attacking:
+            king.in_check = True
+        else:
+            king.in_check = False
         return attacking    
         
     def _create(self):

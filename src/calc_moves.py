@@ -160,26 +160,29 @@ class Calc_Moves:
                 
                 if Square.in_range(legal_move_x, legal_move_y):
                     if self.squares[legal_move_x][legal_move_y].isempty_or_enemy(piece.color):
-                        #create squares of new move
                         initial = Square(row, col)
+                        
+                        #create squares of new move
                         final = Square(legal_move_x, legal_move_y)
 
                         #create new move
                         move = Move(initial, final)
                         if bool:
-                            # check if the move is illegal
-                            if not self.board.illegal(piece, move):                        
-                                # append new move
-                                piece.add_move(move)    
+                            # check if king is in check
+                            if self.board.is_king_in_check(piece):             
+                                piece.in_check = True        
+                                
+                            if not self.board.illegal(piece, move):
+                                piece.add_move(move)   
+                                
                         else: 
                             piece.add_move(move)
                  
             #castling moves
             if not piece.moved:
-                
                 # king-side castling
                 right_rook = self.squares[row][7].piece
-                if isinstance(right_rook, Rook) and not right_rook.moved:
+                if type(right_rook) == Rook and not right_rook.moved:
                     if all(self.squares[row][c].isempty() for c in range(5, 7)):
                         # adds right rook to king
                         piece.right_rook = right_rook
@@ -209,7 +212,7 @@ class Calc_Moves:
                 
                 # queen-side castling
                 left_rook = self.squares[row][0].piece
-                if isinstance(left_rook, Rook) and not left_rook.moved:
+                if type(left_rook) == Rook and not left_rook.moved:
                     if all(self.squares[row][c].isempty() for c in range(1 ,4)):
                         # adds left rook to king
                         piece.left_rook = left_rook
