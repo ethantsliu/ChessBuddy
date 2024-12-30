@@ -33,7 +33,7 @@ class Board:
         
         if type(piece) == King:
             # castling
-            if self.castling(initial, final) and self.valid_castling_squares():
+            if self.castling(initial, final):
                 if final.col > initial.col:  # king-side castling
                     rook_initial = Square(initial.row, 7)
                     rook_final = Square(initial.row, 5)
