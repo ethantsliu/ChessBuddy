@@ -33,7 +33,7 @@ class Board:
         
         if type(piece) == King:
             # castling
-            if self.castling(initial, final):
+            if self.castling(initial, final) and self.valid_castling_squares():
                 if final.col > initial.col:  # king-side castling
                     rook_initial = Square(initial.row, 7)
                     rook_final = Square(initial.row, 5)
@@ -51,11 +51,14 @@ class Board:
             else:
                 piece.x = final.col
                 piece.y = final.row
+            piece.moved = True
         
         
         # move 
         if type(piece) == Pawn:
             piece.moved = True
+        
+        piece.moved = True
         
         # clear valid moves
         piece.clear_moves()
@@ -83,7 +86,7 @@ class Board:
         '''
         return abs(initial.col - final.col) == 2
     
-    def illegal(self, piece, move):
+    def illegal(self, piece, move, ignore = True):
         '''
             Returns whether a move is illegal, False is not illegal
             1) THe king is already in check

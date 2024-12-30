@@ -61,7 +61,8 @@ class King(Piece):
         self.right_rook = None
         self.x = xPos
         self.y = yPos
-        self.in_check = False # only for king
+        self.in_check = False # whether the king is in check
+        self.moved = False
         super().__init__('king', color, value = 1000000.0)
 
         
