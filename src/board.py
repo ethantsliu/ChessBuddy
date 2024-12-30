@@ -37,8 +37,7 @@ class Board:
                 if final.col > initial.col:  # king-side castling
                     rook_initial = Square(initial.row, 7)
                     rook_final = Square(initial.row, 5)
-                    #NEED TO CHECK IF THE SQUARES IN-BTWN ARE BEING ATTACKED
-                
+                    
                 else:  # queen-side castling
                     rook_initial = Square(initial.row, 0)
                     rook_final = Square(initial.row, 3)
@@ -82,18 +81,14 @@ class Board:
     
     def castling(self, initial, final):
         '''
-            Checks if the castling move is possible, but not necessarily checking if it's valid
+        Checks if the castling move is possible
+        Returns False if:
+        1. King has already moved
+        2. Rook has already moved
+        3. It's not a castling move (king doesn't move 2 squares)
         '''
         return abs(initial.col - final.col) == 2
     
-    def illegal(self, piece, move, ignore = True):
-        '''
-            Returns whether a move is illegal, False is not illegal
-            1) THe king is already in check
-            2) The piece is pinned, and moving it puts the king in check
-        '''
-        return self.pinned(piece, move)
-            
     
     def pinned(self, piece, move): 
         '''

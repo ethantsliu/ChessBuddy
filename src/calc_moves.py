@@ -32,8 +32,8 @@ class Calc_Moves:
                         move = Move(initial, final)
                         
                         if bool:
-                            # check if the move is illegal
-                            if not self.board.illegal(piece, move):                        
+                            # check if the move is pinned
+                            if not self.board.pinned(piece, move):                        
                                 # append new move
                                 piece.add_move(move)     
                         else: 
@@ -56,8 +56,8 @@ class Calc_Moves:
                         move = Move(initial, final)
                         
                         if bool:
-                            # check if the move is illegal
-                            if not self.board.illegal(piece, move):                        
+                            # check if the move is pinned
+                            if not self.board.pinned(piece, move):                        
                                 # append new move
                                 piece.add_move(move)     
                         else: 
@@ -89,8 +89,8 @@ class Calc_Moves:
                         move = Move(initial, final)
                         
                         if bool:
-                            # check if the move is illegal
-                            if not self.board.illegal(piece, move):                        
+                            # check if the move is pinned
+                            if not self.board.pinned(piece, move):                        
                                 # append new move
                                 piece.add_move(move)
                                  
@@ -116,8 +116,8 @@ class Calc_Moves:
                         # empty
                         if self.squares[legal_move_row][legal_move_col].isempty():
                             if bool:
-                            # check if the move is illegal
-                                if not self.board.illegal(piece, move):                        
+                            # check if the move is pinned
+                                if not self.board.pinned(piece, move):                        
                                     # append new move
                                     piece.add_move(move)     
                             else: 
@@ -126,8 +126,8 @@ class Calc_Moves:
                         # has enemy piece
                         elif self.squares[legal_move_row][legal_move_col].has_enemy_piece(piece.color):
                             if bool:
-                            # check if the move is illegal
-                                if not self.board.illegal(piece, move):                        
+                            # check if the move is pinned
+                                if not self.board.pinned(piece, move):                        
                                     # append new move
                                     piece.add_move(move)     
                             else: 
@@ -172,7 +172,7 @@ class Calc_Moves:
                             if self.board.is_king_in_check(piece):             
                                 piece.in_check = True        
                                 
-                            if not self.board.illegal(piece, move):
+                            if not self.board.pinned(piece, move):
                                 piece.add_move(move)   
                                 
                         else: 
@@ -199,8 +199,8 @@ class Calc_Moves:
                         
                         
                         if bool:
-                            # check if the move is illegal
-                            if not self.board.illegal(piece, moveK) and not self.board.illegal(right_rook, moveR):                        
+                            # check if the move is pinned
+                            if not self.board.pinned(piece, moveK) and not self.board.pinned(right_rook, moveR):                        
                                 # append new move to rook
                                 right_rook.add_move(moveR)
                                 
@@ -228,8 +228,8 @@ class Calc_Moves:
                         moveR = Move(initial, final)
 
                         if bool:
-                            # check if the move is illegal
-                            if not self.board.illegal(piece, moveK) and not self.board.illegal(left_rook, moveR):                        
+                            # check if the move is pinned
+                            if not self.board.pinned(piece, moveK) and not self.board.pinned(left_rook, moveR):                        
                                 # append new move to rook
                                 left_rook.add_move(moveR)
                                 
