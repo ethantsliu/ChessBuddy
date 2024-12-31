@@ -16,7 +16,26 @@ class Main:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption('Chess')
         self.game = Game()
-    
+        # Add font initialization
+        self.font = pygame.font.SysFont('Arial', 32)
+        
+    def show_checkmate(self, screen, winner):
+        '''
+        Displays the checkmate message
+        '''
+        # Create semi-transparent overlay
+        overlay = pygame.Surface((WIDTH, HEIGHT))
+        overlay.set_alpha(128)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+        
+        # Create text
+        text = self.font.render(f'Checkmate! {winner} wins!', True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+        
+        # Draw text
+        screen.blit(text, text_rect)
+
     def mainloop(self):
         dragger = self.game.dragger
         game = self.game

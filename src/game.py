@@ -144,6 +144,12 @@ class Game:
             self.config.capture_sound.play()
         
         else: self.config.move_sound.play()
+    
+    def play_checkmate(self):
+        self.config.checkmate.play()
+    
+    def play_castle(self):
+        self.config.castling.play()
         
     def reset(self):
         self.__init__()

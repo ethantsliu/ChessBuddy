@@ -62,7 +62,8 @@ class King(Piece):
         self.x = xPos
         self.y = yPos
         self.in_check = False # whether the king is in check
-        self.moved = False
+        self.moved = False # whether the king has moved, for the purposes of castling
+        self.checkmated = False # whether the king has been checkmated
         super().__init__('king', color, value = 1000000.0)
 
         

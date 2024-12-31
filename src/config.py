@@ -22,9 +22,10 @@ class Config:
         self._add_sounds()
         self.idxs = 0 
         self.sound = self.sounds[self.idxs] 
-        
         self.move_sound = Sound(os.path.join('assets/sounds/' + self.sound[0]))
-        
+        self.checkmate = Sound(os.path.join('assets/sounds/chess_com_checkmate.mp3'))
+        self.promote = Sound(os.path.join('assets/sounds/chess_com_promote.mp3'))
+        self.castling = Sound(os.path.join('assets/sounds/chess_com_castle.mp3'))
         self.capture_sound = Sound(
             os.path.join('assets/sounds/' + self.sound[1]))
     
@@ -63,6 +64,5 @@ class Config:
         self.idxs %= len(self.sounds)
         self.sound = self.sounds[self.idxs]
         self.move_sound = Sound(os.path.join('assets/sounds/' + self.sound[0]))
-        
         self.capture_sound = Sound(
             os.path.join('assets/sounds/' + self.sound[1]))
