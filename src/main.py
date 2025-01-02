@@ -48,7 +48,6 @@ class Main:
             game.show_last_move(screen)
             game.show_moves(screen)
             game.show_pieces(screen)
-            
             game.show_hover(screen)
             
             if dragger.dragging:
@@ -58,7 +57,6 @@ class Main:
                 # click
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     dragger.update_mouse(event.pos)
-                    
                     clicked_row = dragger.mouseY // SQSIZE
                     clicked_col = dragger.mouseX // SQSIZE
                     
@@ -72,11 +70,7 @@ class Main:
                                 print(f"Calculated moves: {len(piece.moves)}")
                                 dragger.save_initial(event.pos)
                                 dragger.drag_piece(piece)
-                                # show methods
-                                game.show_bg(screen)
-                                game.show_last_move(screen)
-                                game.show_moves(screen)
-                                game.show_pieces(screen)
+                                
                     except Exception:
                         pass
                         
@@ -89,13 +83,6 @@ class Main:
                     
                     if dragger.dragging:
                         dragger.update_mouse(event.pos)
-                        #show methods
-                        game.show_bg(screen)
-                        game.show_last_move(screen)
-                        game.show_moves(screen)
-                        game.show_pieces(screen)
-                        game.show_hover(screen)
-                        dragger.update_blit(screen)
                 
                 # release click
                 elif event.type == pygame.MOUSEBUTTONUP:
@@ -105,30 +92,25 @@ class Main:
                             released_row = dragger.mouseY //SQSIZE
                             released_col = dragger.mouseX // SQSIZE
                             
+                            piece = dragger.piece
+                            dragger.undrag_piece()
+                            
                             # create possible move 
                             initial = Square(dragger.initial_row, dragger.initial_col)
                             final = Square(released_row, released_col)
-                            
                             move = Move(initial, final)
                             
                             # if valid move
-                            if board.valid_move(dragger.piece, move):
+                            if board.valid_move(piece, move):
                                 captured = board.squares[released_row][released_col].has_piece()
-                                board.move(dragger.piece, move)
+                                board.move(piece, move)
                                 
                                 # play sound
                                 game.play_sound(captured)
                                 
-                                # show method
-                                game.show_bg(screen)
-                                game.show_last_move(screen)
-                                game.show_pieces(screen)
-                                
                                 #next turn
                                 game.next_turn()
-                            
-                        dragger.undrag_piece()
-                    
+                                
                     except Exception:
                         pass
                     
