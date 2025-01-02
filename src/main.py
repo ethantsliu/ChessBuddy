@@ -120,7 +120,10 @@ class Main:
                                     opponent_king = board.kings[0]
                                 if board.is_king_in_check(opponent_king):
                                     if board.is_checkmate(opponent_king):
+                                        pygame.time.wait(200)
                                         self.show_checkmate(screen, piece.color.capitalize())
+                                        game.play_checkmate()
+                                        
                                         pygame.display.update()
                                         pygame.time.wait(3000)
                                         game.reset()
