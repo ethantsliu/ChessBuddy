@@ -35,6 +35,7 @@ class Main:
         
         # Draw text
         screen.blit(text, text_rect)
+        pygame.display.update()
 
     def mainloop(self):
         dragger = self.game.dragger
@@ -103,13 +104,30 @@ class Main:
                             if board.valid_move(piece, move):
                                 captured = board.squares[released_row][released_col].has_piece()
                                 board.move(piece, move)
-                                
                                 # play sound
                                 game.play_sound(captured)
                                 
-                                #next turn
-                                game.next_turn()
+                                game.show_bg(screen)
+                                game.show_last_move(screen)
+                                game.show_moves(screen)
+                                game.show_pieces(screen)
+                                game.show_hover(screen)
+                                pygame.display.update()
                                 
+                                if piece.color == 'white':
+                                    opponent_king = board.kings[1]
+                                else: 
+                                    opponent_king = board.kings[0]
+                                if board.is_king_in_check(opponent_king):
+                                    if board.is_checkmate(opponent_king):
+                                        self.show_checkmate(screen, piece.color.capitalize())
+                                        pygame.display.update()
+                                        pygame.time.wait(3000)
+                                        game.reset()
+                                        dragger = self.game.dragger
+                                        board = self.game.board
+                                        continue
+                                game.next_turn()
                     except Exception:
                         pass
                     

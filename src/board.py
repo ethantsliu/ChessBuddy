@@ -11,8 +11,13 @@ class Board:
         self.squares = [[0, 0, 0, 0, 0, 0, 0, 0] for col in range(COLS)]
         self.last_move = None
         self._create()
+        # Keep track of the kings. 0-index is white king, 1-index is black king
+        self.kings = []
         self._add_pieces('white')
         self._add_pieces('black')
+        
+    def getKingPositions(self): 
+        return [[self.kings[0].x, self.kings[0].y], [self.kings[1].x, self.kings[1].y]]
     
     def move(self, piece, move):
         print(f"Attempting to move {piece.name} from {move.initial.row},{move.initial.col} to {move.final.row},{move.final.col}")
@@ -206,7 +211,10 @@ class Board:
         self.squares[row_other][3] = Square(row_other, 3, Queen(color))
         
         # king
-        self.squares[row_other][4] = Square(row_other, 4, King(color, row_other, 4))
+        king = King(color, row_other, 4)
+        self.squares[row_other][4] = Square(row_other, 4, king)
+        self.kings.append(king)
+        print(self.kings[-1].x, self.kings[-1].y)
         
 
     def calc_moves(self, piece, row, col, bool=True):
