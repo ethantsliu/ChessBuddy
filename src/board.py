@@ -20,10 +20,27 @@ class Board:
         initial = move.initial
         final = move.final 
         
+        # Check for adjacent kings if this is a king move
+        if isinstance(piece, King):
+            # Possible adjacent squares relative to the final position
+            adjacent_squares = [
+                (final.row-1, final.col-1), (final.row-1, final.col), (final.row-1, final.col+1),
+                (final.row, final.col-1),                              (final.row, final.col+1),
+                (final.row+1, final.col-1), (final.row+1, final.col), (final.row+1, final.col+1)
+            ]
+            
+            # Check each adjacent square for enemy king
+            for row, col in adjacent_squares:
+                if Square.in_range(row, col):  # Make sure square is on board
+                    square = self.squares[row][col]
+                    if square.has_piece() and isinstance(square.piece, King) and square.piece.color != piece.color:
+                        print("Invalid move: Kings cannot be adjacent")
+                        return False
+        
         # console board move update 
         self.squares[initial.row][initial.col].piece = None
         self.squares[final.row][final.col].piece = piece
-        
+            
         print(f"Move completed for {piece.name}")
         
         # pawn promotion
@@ -74,7 +91,7 @@ class Board:
     def check_promotion(self, piece, final):
         '''
             Checks if the piece is eligible for promotion
-            Later implement optional promotion to different pieces 
+            Later need to implement optional promotion to different pieces 
         '''
         if final.row == 0 or final.row == 7:
             self.squares[final.row][final.col].piece = Queen(piece.color)

@@ -160,23 +160,37 @@ class Calc_Moves:
                 
                 if Square.in_range(legal_move_x, legal_move_y):
                     if self.squares[legal_move_x][legal_move_y].isempty_or_enemy(piece.color):
-                        initial = Square(row, col)
+                        # Check for adjacent enemy king
+                        adjacent_squares = [
+                            (legal_move_x-1, legal_move_y-1), (legal_move_x-1, legal_move_y), (legal_move_x-1, legal_move_y+1),
+                            (legal_move_x, legal_move_y-1),                                    (legal_move_x, legal_move_y+1),
+                            (legal_move_x+1, legal_move_y-1), (legal_move_x+1, legal_move_y), (legal_move_x+1, legal_move_y+1)
+                        ]
                         
-                        #create squares of new move
-                        final = Square(legal_move_x, legal_move_y)
-
-                        #create new move
-                        move = Move(initial, final)
-                        if bool:
-                            # check if king is in check
-                            if self.board.is_king_in_check(piece):             
-                                piece.in_check = True        
-                                
-                            if not self.board.pinned(piece, move):
-                                piece.add_move(move)   
-                                
-                        else: 
-                            piece.add_move(move)
+                        king_adjacent = False
+                        for adj_row, adj_col in adjacent_squares:
+                            if Square.in_range(adj_row, adj_col):
+                                adj_square = self.squares[adj_row][adj_col]
+                                if (adj_square.has_piece() and 
+                                    isinstance(adj_square.piece, King) and 
+                                    adj_square.piece.color != piece.color):
+                                    king_adjacent = True
+                                    break
+                        
+                        if not king_adjacent:
+                            initial = Square(row, col)
+                            final = Square(legal_move_x, legal_move_y)
+                            move = Move(initial, final)
+                            
+                            if bool:
+                                # check if king is in check
+                                if self.board.is_king_in_check(piece):             
+                                    piece.in_check = True        
+                                    
+                                if not self.board.pinned(piece, move):
+                                    piece.add_move(move)   
+                            else: 
+                                piece.add_move(move)
                  
             #castling moves
             if not piece.moved:
