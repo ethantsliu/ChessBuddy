@@ -27,13 +27,13 @@ class Board:
         
         # Handle en-passant FIRST, before any other moves
         if isinstance(piece, Pawn):
-            if hasattr(move, 'is_enpassant') and move.is_enpassant:
+            if move.is_enpassant:
                 print(f"En passant capture detected!")
                 print(f"Initial row {move.initial.row} and initial col {move.initial.col}, final row {move.final.row} and col {move.final.col} of move ")
                 # Clear the captured pawn's square
                 print(f"Last pawn move: {self.last_pawn_move.initial.row, self.last_pawn_move.initial.col, self.last_pawn_move.final.row, self.last_pawn_move.final.col}")
                 print(f"Last general move: {self.last_move}")
-                self.squares[self.last_pawn_move.final.row][self.last_pawn_move.final.col].piece = None
+                self.squares[initial.row][final.col].piece = None
                 print(f"Square cleared: {self.squares[initial.row][final.col].piece}")
                 print(self.squares[initial.row][final.col])
         
@@ -106,9 +106,7 @@ class Board:
     def valid_move(self, piece, move):
         print(f"Checking if move is valid for {piece.name}")
         print(f"Available moves: {len(piece.moves)}")
-        is_valid = move in piece.moves
-        print(f"Move is {'valid' if is_valid else 'invalid'}")
-        return is_valid
+        return move in piece.moves
     
     def check_promotion(self, piece, final):
         '''
@@ -168,7 +166,9 @@ class Board:
         return attacking    
     
     def is_enpassant_possible(self):
-        '''Check if en passant is possible based on the last pawn move'''
+        '''Check if en passant is possible based on the last move, which must be a pawn move for two squares
+           Does not guarantee that en passant can be performed, as the current pawn must also be adjacent to the last_pawn_move
+        '''
         if not self.last_pawn_move:
             return False
             

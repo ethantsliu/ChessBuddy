@@ -95,16 +95,21 @@ class Main:
                             piece = dragger.piece
                             dragger.undrag_piece()
                             
-                            # create possible move 
-                            initial = Square(dragger.initial_row, dragger.initial_col)
-                            final = Square(released_row, released_col)
-                            move = Move(initial, final)
+                            board.calc_moves(piece, dragger.initial_row, dragger.initial_col)
                             
+                            move = None
+                            for mov in piece.moves:
+                                if mov.final.row == released_row and mov.final.col == released_col:
+                                    move = mov
+                                    break
                             # if valid move
                             if board.valid_move(piece, move):
                                 check = False
-                                if hasattr(move, 'is_enpassant') and move.is_enpassant:
+                                
+                                print(f"Is move an en passant? {move.is_enpassant}")
+                                if move.is_enpassant:
                                     captured = True
+                                    move.is_enpassant = True 
                                 else: 
                                     captured = board.squares[released_row][released_col].has_piece()
                                 

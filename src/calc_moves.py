@@ -65,15 +65,14 @@ class Calc_Moves:
                         
             # en passant moves
             if self.board.is_enpassant_possible():
-                last_move = self.board.last_pawn_move
-                if last_move and row == last_move.final.row:  # Same rank
-                    if abs(col - last_move.final.col) == 1:  # Adjacent column
+                last_move = self.board.last_pawn_move # Must be a last_pawn_move if self.board.is_enpassant_possible
+                if row == last_move.final.row:  # Same rank
+                    if abs(col - last_move.final.col) == 1:  # Adjacent column, guarantees en passant can be performed
                         # Create en passant move
                         initial = Square(row, col)
                         final = Square(row + piece.dir, last_move.final.col)
                         # Add captured piece info to the move
-                        move = Move(initial, final)
-                        move.is_enpassant = True  # Mark as en passant move
+                        move = Move(initial, final, is_enpassant = True) # If played, this would be an en passant 
                         
                         if bool:
                             if not self.board.pinned(piece, move):
