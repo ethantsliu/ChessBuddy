@@ -61,7 +61,27 @@ class Calc_Moves:
                                 # append new move
                                 piece.add_move(move)     
                         else: 
-                            piece.add_move(move)  
+                            piece.add_move(move)
+                        
+            # en passant moves
+            if self.board.is_enpassant_possible():
+                last_move = self.board.last_pawn_move
+                if last_move and row == last_move.final.row:  # Same rank
+                    if abs(col - last_move.final.col) == 1:  # Adjacent column
+                        # Create en passant move
+                        initial = Square(row, col)
+                        final = Square(row + piece.dir, last_move.final.col)
+                        # Add captured piece info to the move
+                        move = Move(initial, final)
+                        move.is_enpassant = True  # Mark as en passant move
+                        
+                        if bool:
+                            if not self.board.pinned(piece, move):
+                                piece.add_move(move)
+                        else:
+                            piece.add_move(move)
+                            
+
         
         def knight_moves():
             possible_moves = [

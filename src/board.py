@@ -15,15 +15,32 @@ class Board:
         self.kings = []
         self._add_pieces('white')
         self._add_pieces('black')
+        self.last_pawn_move = None
         
     def getKingPositions(self): 
         return [[self.kings[0].x, self.kings[0].y], [self.kings[1].x, self.kings[1].y]]
     
     def move(self, piece, move):
         print(f"Attempting to move {piece.name} from {move.initial.row},{move.initial.col} to {move.final.row},{move.final.col}")
-        
         initial = move.initial
         final = move.final 
+        
+        # Handle en-passant FIRST, before any other moves
+        if isinstance(piece, Pawn):
+            if hasattr(move, 'is_enpassant') and move.is_enpassant:
+                print(f"En passant capture detected!")
+                print(f"Initial row {move.initial.row} and initial col {move.initial.col}, final row {move.final.row} and col {move.final.col} of move ")
+                # Clear the captured pawn's square
+                print(f"Last pawn move: {self.last_pawn_move.initial.row, self.last_pawn_move.initial.col, self.last_pawn_move.final.row, self.last_pawn_move.final.col}")
+                print(f"Last general move: {self.last_move}")
+                self.squares[self.last_pawn_move.final.row][self.last_pawn_move.final.col].piece = None
+                print(f"Square cleared: {self.squares[initial.row][final.col].piece}")
+                print(self.squares[initial.row][final.col])
+        
+        # console board move update 
+        self.squares[initial.row][initial.col].piece = None
+        self.squares[final.row][final.col].piece = piece
+        piece.moved = True
         
         # Check for adjacent kings if this is a king move
         if isinstance(piece, King):
@@ -42,16 +59,14 @@ class Board:
                         print("Invalid move: Kings cannot be adjacent")
                         return False
         
-        # console board move update 
-        self.squares[initial.row][initial.col].piece = None
-        self.squares[final.row][final.col].piece = piece
+        
             
         print(f"Move completed for {piece.name}")
         
         # pawn promotion
         if piece.name == 'pawn':
             self.check_promotion(piece, final)
-        
+            self.moved = True
         
         if type(piece) == King:
             # castling
@@ -72,12 +87,14 @@ class Board:
             else:
                 piece.x = final.col
                 piece.y = final.row
-            piece.moved = True
         
         
         # move 
         if type(piece) == Pawn:
             piece.moved = True
+            self.last_pawn_move = move
+        else:
+            self.last_pawn_move = None
         
         piece.moved = True
         
@@ -110,7 +127,6 @@ class Board:
         3. It's not a castling move (king doesn't move 2 squares)
         '''
         return abs(initial.col - final.col) == 2
-    
     
     def pinned(self, piece, move): 
         '''
@@ -150,6 +166,19 @@ class Board:
         else:
             king.in_check = False
         return attacking    
+    
+    def is_enpassant_possible(self):
+        '''Check if en passant is possible based on the last pawn move'''
+        if not self.last_pawn_move:
+            return False
+            
+        piece = self.squares[self.last_pawn_move.final.row][self.last_pawn_move.final.col].piece
+        
+        # Check if last move was a pawn moving two squares
+        if isinstance(piece, Pawn):
+            return abs(self.last_pawn_move.final.row - self.last_pawn_move.initial.row) == 2
+            
+        return False
     
     def is_checkmate(self, king):
         '''

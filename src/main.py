@@ -103,7 +103,11 @@ class Main:
                             # if valid move
                             if board.valid_move(piece, move):
                                 check = False
-                                captured = board.squares[released_row][released_col].has_piece()
+                                if hasattr(move, 'is_enpassant') and move.is_enpassant:
+                                    captured = True
+                                else: 
+                                    captured = board.squares[released_row][released_col].has_piece()
+                                
                                 board.move(piece, move)
                                 game.show_bg(screen)
                                 game.show_last_move(screen)
