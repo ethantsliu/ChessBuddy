@@ -102,11 +102,9 @@ class Main:
                             
                             # if valid move
                             if board.valid_move(piece, move):
+                                check = False
                                 captured = board.squares[released_row][released_col].has_piece()
                                 board.move(piece, move)
-                                # play sound
-                                game.play_sound(captured)
-                                
                                 game.show_bg(screen)
                                 game.show_last_move(screen)
                                 game.show_moves(screen)
@@ -119,17 +117,25 @@ class Main:
                                 else: 
                                     opponent_king = board.kings[0]
                                 if board.is_king_in_check(opponent_king):
+                                    check = True
                                     if board.is_checkmate(opponent_king):
                                         pygame.time.wait(200)
                                         self.show_checkmate(screen, piece.color.capitalize())
                                         game.play_checkmate()
-                                        
                                         pygame.display.update()
                                         pygame.time.wait(3000)
                                         game.reset()
                                         dragger = self.game.dragger
                                         board = self.game.board
                                         continue
+                                    else:
+                                        # Play check sound if it's not checkmate
+                                        game.play_check()
+                                        pygame.display.update()
+                                # play sound
+                                if not check:
+                                    game.play_sound(captured)
+                                check = False
                                 game.next_turn()
                     except Exception:
                         pass

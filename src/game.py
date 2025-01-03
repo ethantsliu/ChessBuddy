@@ -148,6 +148,9 @@ class Game:
     def play_checkmate(self):
         self.config.checkmate.play()
     
+    def play_check(self):
+        self.config.check.play()
+    
     def play_castle(self):
         self.config.castling.play()
         
