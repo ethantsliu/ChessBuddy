@@ -36,7 +36,24 @@ class Main:
         # Draw text
         screen.blit(text, text_rect)
         pygame.display.update()
-
+    def show_stalemate (self, screen):
+        '''
+        Displays the checkmate message
+        '''
+        # Create semi-transparent overlay
+        overlay = pygame.Surface((WIDTH, HEIGHT))
+        overlay.set_alpha(128)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+        
+        # Create text
+        text = self.font.render(f'Stalemate!', True, (255, 255, 255))
+        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+        
+        # Draw text
+        screen.blit(text, text_rect)
+        pygame.display.update()
+        
     def mainloop(self):
         dragger = self.game.dragger
         game = self.game
@@ -44,6 +61,8 @@ class Main:
         board = self.game.board
         
         while True:
+            opponent_king = board.kings[1] if game.next_player == 'white' else board.kings[0]
+            
             #show methods
             game.show_bg(screen)
             game.show_last_move(screen)
@@ -141,6 +160,20 @@ class Main:
                                         # Play check sound if it's not checkmate
                                         game.play_check()
                                         pygame.display.update()
+                                else: 
+                                    if board.is_stalemate(opponent_king):
+                                        print("Stalemate detected!")
+                                        self.show_stalemate(screen)
+                                        game.play_stalemate()
+                                        pygame.display.update()
+
+                                        # Wait for 3 seconds to show the stalemate message
+                                        pygame.time.wait(3000)
+
+                                        game.reset()  # Reset the game
+                                        dragger = self.game.dragger
+                                        board = self.game.board
+                                        continue  # Skip the rest of the loop and start a new turn
                                 # play sound
                                 if not check:
                                     game.play_sound(captured)

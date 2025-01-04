@@ -180,6 +180,29 @@ class Board:
             
         return False
     
+    def is_stalemate(self, king):
+        '''
+            Returns True if there is a stalemate, False if otherwise
+            Conditions for stalemate
+            1. King is not in check
+            2. No legal moves for any piece of the same color
+        '''
+        if king.in_check:
+            return False
+        
+        # Check for any legal moves for all pieces of the same color
+        for row in range(ROWS):
+            for col in range(COLS):
+                if self.squares[row][col].has_team_piece(king.color):
+                    piece = self.squares[row][col].piece
+                    # Calculate legal moves for this piece
+                    self.calc_moves(piece, row, col, bool=True)
+                    # If any piece has legal moves, it's not checkmate
+                    if piece.moves:
+                        return False
+
+        return True
+    
     def is_checkmate(self, king):
         '''
             Returns True if there is a checkmate, False if otherwise

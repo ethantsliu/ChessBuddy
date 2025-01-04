@@ -147,6 +147,9 @@ class Game:
     
     def play_checkmate(self):
         self.config.checkmate.play()
+        
+    def play_stalemate(self):
+        self.config.checkmate.play()
     
     def play_check(self):
         self.config.check.play()
