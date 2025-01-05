@@ -1,3 +1,4 @@
+
 import pygame
 import sys
 import os
@@ -108,6 +109,7 @@ class Main:
                         return 
                     elif event.key == pygame.K_l:
                         self.load_game()
+                        return 
                     elif event.key == pygame.K_q:
                         pygame.quit()
                         sys.exit()
@@ -297,14 +299,13 @@ class Main:
         '''
         try:
             with open("save.txt", "r") as file:
-                data = file.read().splitlines()
+                data = file.read().strip().split(" ")
                 print(data)
                 # Extract FEN, turn, and other data
-                fen_line = data[0].split(" ").strip()  # Get FEN string
-                print(fen_line)
-                turn_line = data.split(" ")[1].strip()  # Get current turn
-                castling_line = data.split(" ")[1].strip()  # Get castling rights (if stored)
-                en_passant_line = data.split(" ")[1].strip()  # Get en passant (if stored)
+                fen_line = data[0] # Get FEN string
+                turn_line = data[1]  # Get current turn
+                castling_line = data[2]  # Get castling rights (if stored)
+                en_passant_line = data[3]  # Get en passant (if stored)
 
                 print("Loaded game state:")
                 print(f"FEN: {fen_line}")
@@ -316,14 +317,15 @@ class Main:
                 self.load_board_from_fen(fen_line)
 
                 # Set the turn to the correct player
-                self.game.next_player = turn_line
+                self.game.next_player = 'white' if turn_line == 'w' else 'black'
 
                 # Set castling rights (if applicable)
                 self.set_castling_rights(castling_line)
 
                 # Set en passant rights (if applicable)
-                self.set_en_passant(en_passant_line)
+                # self.set_en_passant(en_passant_line)
 
+                
         except FileNotFoundError:
             print("No saved game found.")
             
@@ -347,7 +349,58 @@ class Main:
             fen += '/'
         fen = fen[:-1]  # Remove the last '/'
         return fen
-
+    
+    def load_board_from_fen(self, fen):
+        ''' 
+            Load the board from FEN string
+        '''
+        board = self.game.board  
+        board_state = fen.split('/')  
+        piece_dict = {'r': 'rook', 'p': 'pawn', 'q': 'queen', 'k': 'king', 'n': 'knight', 'b': 'bishop'}
+        kings_positions = {'white': {'king': None, 'left_rook': None, 'right_rook': None},
+                       'black': {'king': None, 'left_rook': None, 'right_rook': None}}
+        rooks_positions = {'white': {'left_rook': None, 'right_rook': None},
+                        'black': {'left_rook': None, 'right_rook': None}}
+        print(f"Board State: {board_state}")
+        # Loop through each row in the board FEN string
+        for i, row in enumerate(board_state):
+            j = 0  # column pointer
+            for char in row:
+                if char.isdigit():  # Empty squares
+                    empty_squares = int(char)
+                    for _ in range(empty_squares):
+                        board.squares[i][j].piece = None  # Set the piece of this square to None
+                        j += 1
+                else:
+                    piece_name = piece_dict[char.lower()]
+                    color = 'white' if char.isupper() else 'black'
+                    
+                    import piece
+                    piece_class = getattr(piece, piece_name.capitalize())
+                
+                    if piece_name == 'king':
+                        current_piece = piece_class(color, xPos = i, yPos = j)
+                        board.squares[i][j].piece = current_piece
+                        kings_positions[color]['king'] = current_piece
+                    elif piece_name == 'rook':
+                        current_piece = piece_class(color)
+                        board.squares[i][j].piece = current_piece
+                        if j == 0:
+                            rooks_positions[color]['left_rook'] = current_piece
+                        elif j == 7:
+                            rooks_positions[color]['right_rook'] = current_piece 
+                    else: 
+                        current_piece = piece_class(color)
+                        board.squares[i][j].piece = current_piece
+                    print(f"Placed {piece_name} at {i},{j}")
+                    j += 1
+                    
+            for color in kings_positions:
+                king = kings_positions[color]['king']
+                if king:
+                    king.left_rook = rooks_positions[color]['left_rook']
+                    king.right_rook = rooks_positions[color]['right_rook']
+                    
     def save_game_to_fen(self, board, turn, castling='KQkq', en_passant='-', halfmove_clock=0, fullmove_number=1):
         '''
             Saves the current game to save.txt as FEN
@@ -380,6 +433,56 @@ class Main:
 
         # If no castling rights are left, return '-'
         return castling_rights if castling_rights else '-'
+
+    def set_castling_rights(self, castling_rights):
+        '''
+            Set the castling rights from a string.
+        '''
+        board = self.game.board
+        white_king = board.kings[0]
+        
+        # White King castling rights check
+        if 'K' not in castling_rights and 'Q' not in castling_rights:
+            white_king.moved = True
+            
+        else:
+            white_king.moved = False
+            # White King-side
+            if 'K' in castling_rights:  # 'K' in, 'Q' not. 
+                if white_king.left_rook:
+                    white_king.left_rook.moved = True
+                if white_king.right_rook:
+                    white_king.right_rook.moved = False
+            
+            # White Queen-side 
+            else: # 'K' out, 'Q' in. 
+                if white_king.left_rook:
+                    white_king.left_rook.moved = False
+                if white_king.right_rook:
+                    white_king.right_rook.moved = True 
+                
+    
+        black_king = board.kings[1]
+         # Black King castling rights check
+        if 'k' not in castling_rights and 'q' not in castling_rights:
+            black_king.moved = True
+            
+        else:
+            black_king.moved = False
+            # Black King-side
+            if 'k' in castling_rights:  # 'k' in, 'q' not. 
+                if black_king.left_rook:
+                    black_king.left_rook.moved = True
+                if black_king.right_rook:
+                    black_king.right_rook.moved = False
+            
+            # Black Queen-side
+            else: # 'k' out, 'q' in. 
+                if black_king.left_rook:
+                    black_king.left_rook.moved = False
+                if black_king.right_rook:
+                    black_king.right_rook.moved = True 
+            
 
 main = Main()
 main.mainloop()
