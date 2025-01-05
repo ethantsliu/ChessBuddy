@@ -23,6 +23,11 @@ class Piece:
         
     def clear_moves(self):
         self.moves = []
+    
+    def fen_symbol(self):
+        if self.name == 'knight':
+            return 'N' if self.color == 'white' else 'n'
+        return self.name[:1].upper() if self.color == 'white' else self.name[:1].lower()
         
 class Pawn(Piece):
     

@@ -118,11 +118,9 @@ class Board:
     
     def castling(self, initial, final):
         '''
-        Checks if the castling move is possible
+        Checks if the castling move is theoretically possible
         Returns False if:
-        1. King has already moved
-        2. Rook has already moved
-        3. It's not a castling move (king doesn't move 2 squares)
+        It's not a castling move (king doesn't move 2 squares)
         '''
         return abs(initial.col - final.col) == 2
     
@@ -265,6 +263,7 @@ class Board:
         # king
         king = King(color, row_other, 4)
         self.squares[row_other][4] = Square(row_other, 4, king)
+        king.left_rook, king.right_rook = self.squares[row_other][0].piece, self.squares[row_other][7].piece
         self.kings.append(king)
         print(self.kings[-1].x, self.kings[-1].y)
         

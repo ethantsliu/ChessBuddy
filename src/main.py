@@ -23,6 +23,7 @@ class Main:
         self.game = Game()
         # Add font initialization
         self.font = pygame.font.SysFont('Arial', 32)
+        # (7, 4) -> (1, e) -> e1 white king
         
     def show_checkmate(self, screen, winner):
         '''
@@ -71,12 +72,12 @@ class Main:
         subtitle_font = pygame.font.SysFont('Arial', 40)
         
         menu_options = ["New Game (N)", 
-                        "Load Game (L)", 
+                        "Load Last Game (L)", 
                         "Quit Game (Q)", 
                         "During the game:", 
                         "Reset (R)", 
-                        "Change Sound (S)", 
-                        "Save Game (E)", 
+                        "Change Sound (C)", 
+                        "Save Game (S)", 
                         "Quit Game (Q)"]
 
         while True:
@@ -246,7 +247,7 @@ class Main:
                             game.change_theme()
                             
                         # changing sounds
-                        elif event.key == pygame.K_s:
+                        elif event.key == pygame.K_c:
                             game.change_sound()
                             
                         # restart
@@ -260,9 +261,16 @@ class Main:
                             pygame.quit()
                             sys.exit()
                         
-                        # elif event.key == pygame.K_e:
-                            # self.save_game(board_state, turn)
-                    
+                        elif event.key == pygame.K_s:
+                            en_passant = ''
+                            castling='KQkq'
+                            if board.is_enpassant_possible(): 
+                                # (7, 4) -> (1, e) -> e1, position of white king
+                                en_passant = f'{chr(board.last_pawn_move.final.col + 97)}{board.last_pawn_move.final.row}' 
+                            castling = self.get_castling_rights(board)
+                            self.save_game_to_fen(board, game.next_player, castling=castling , en_passant=en_passant)
+                            print("Successfully saved!")
+                            print(f"Current working directory: {os.getcwd()}")
                     # quit game 
                     elif event.type == pygame.QUIT: 
                         pygame.quit()
@@ -270,7 +278,10 @@ class Main:
                 pygame.display.update()
     
     def start_new_game(self):
-        # Reset the game object, which includes the board and other game states
+        '''
+            Starts a new game.
+            Reset the game object, which includes the board and other game states
+        '''
         self.game.reset()
         
         # Refresh the screen
@@ -279,25 +290,94 @@ class Main:
         pygame.display.update()
         return 
         
-    def load_game():
+    def load_game(self):
         ''' 
             Load a saved game from save.txt
         '''
         try:
             with open("save.txt", "r") as file:
                 data = file.read().splitlines()
+
+                # Extract FEN, turn, and other data
+                fen_line = data[0].split(":")[1].strip()  # Get FEN string
+                turn_line = data[1].split(":")[1].strip()  # Get current turn
+                castling_line = data[2].split(":")[1].strip()  # Get castling rights (if stored)
+                en_passant_line = data[3].split(":")[1].strip()  # Get en passant (if stored)
+
                 print("Loaded game state:")
-                for line in data:
-                    print(line)  # You can process the game state further, like loading the board, etc.
+                print(f"FEN: {fen_line}")
+                print(f"Turn: {turn_line}")
+                print(f"Castling Rights: {castling_line}")
+                print(f"En Passant: {en_passant_line}")
+
+                # Reconstruct board from FEN
+                self.load_board_from_fen(fen_line)
+
+                # Set the turn to the correct player
+                self.game.next_player = turn_line
+
+                # Set castling rights (if applicable)
+                self.set_castling_rights(castling_line)
+
+                # Set en passant rights (if applicable)
+                self.set_en_passant(en_passant_line)
+
         except FileNotFoundError:
             print("No saved game found.")
             
-    def save_game(board_state, turn):
+    def board_to_fen(self, board):
+        '''
+            Converts the current board to FEN (Forsyth-Edwards Notation)
+        '''
+        fen = ""
+        for row in board.squares:
+            empty_squares = 0
+            for square in row:
+                if square.isempty():
+                    empty_squares += 1
+                else:
+                    if empty_squares > 0:
+                        fen += str(empty_squares)
+                        empty_squares = 0
+                    fen += square.piece.fen_symbol()
+            if empty_squares > 0:
+                fen += str(empty_squares)
+            fen += '/'
+        fen = fen[:-1]  # Remove the last '/'
+        return fen
+
+    def save_game_to_fen(self, board, turn, castling='KQkq', en_passant='-', halfmove_clock=0, fullmove_number=1):
+        '''
+            Saves the current game to save.txt as FEN
+        '''
+        fen_board = self.board_to_fen(board)
+        fen_turn = 'w' if turn == 'white' else 'b'
+        fen = f"{fen_board} {fen_turn} {castling} {en_passant} {halfmove_clock} {fullmove_number}"
+        
         with open("save.txt", "w") as file:
-            # Save the board state
-            file.write("Board State\n")
-            file.write(str(board_state) + '\n')  # Board data
-            file.write(f"Turn: {turn}\n")
+            file.write(f"FEN: {fen}\n")
     
+    def get_castling_rights(self, board):
+        castling_rights = ''
+        
+        # Check White's king and rooks
+        white_king = board.kings[0]
+        if not white_king.moved:
+            if not white_king.left_rook.moved:
+                castling_rights += 'Q'  # White can castle queenside
+            if not white_king.right_rook.moved:
+                castling_rights += 'K'  # White can castle kingside
+
+        # Check Black's king and rooks
+        black_king = board.kings[1]
+        if not black_king.moved:
+            if not black_king.left_rook.moved:
+                castling_rights += 'q'  # Black can castle queenside
+            if not black_king.right_rook.moved:
+                castling_rights += 'k'  # Black can castle kingside
+
+        # If no castling rights are left, return '-'
+        return castling_rights if castling_rights else '-'
+
 main = Main()
 main.mainloop()
