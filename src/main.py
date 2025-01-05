@@ -262,11 +262,12 @@ class Main:
                             sys.exit()
                         
                         elif event.key == pygame.K_s:
-                            en_passant = ''
+                            en_passant = '-'
                             castling='KQkq'
                             if board.is_enpassant_possible(): 
                                 # (7, 4) -> (1, e) -> e1, position of white king
                                 en_passant = f'{chr(board.last_pawn_move.final.col + 97)}{board.last_pawn_move.final.row}' 
+                                print(f'Is en_passant possible? {en_passant}')
                             castling = self.get_castling_rights(board)
                             self.save_game_to_fen(board, game.next_player, castling=castling , en_passant=en_passant)
                             print("Successfully saved!")
@@ -297,12 +298,13 @@ class Main:
         try:
             with open("save.txt", "r") as file:
                 data = file.read().splitlines()
-
+                print(data)
                 # Extract FEN, turn, and other data
-                fen_line = data[0].split(":")[1].strip()  # Get FEN string
-                turn_line = data[1].split(":")[1].strip()  # Get current turn
-                castling_line = data[2].split(":")[1].strip()  # Get castling rights (if stored)
-                en_passant_line = data[3].split(":")[1].strip()  # Get en passant (if stored)
+                fen_line = data[0].split(" ").strip()  # Get FEN string
+                print(fen_line)
+                turn_line = data.split(" ")[1].strip()  # Get current turn
+                castling_line = data.split(" ")[1].strip()  # Get castling rights (if stored)
+                en_passant_line = data.split(" ")[1].strip()  # Get en passant (if stored)
 
                 print("Loaded game state:")
                 print(f"FEN: {fen_line}")
@@ -355,7 +357,7 @@ class Main:
         fen = f"{fen_board} {fen_turn} {castling} {en_passant} {halfmove_clock} {fullmove_number}"
         
         with open("save.txt", "w") as file:
-            file.write(f"FEN: {fen}\n")
+            file.write(f"{fen}\n")
     
     def get_castling_rights(self, board):
         castling_rights = ''
